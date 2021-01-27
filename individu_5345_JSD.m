@@ -80,9 +80,9 @@ end
 for t=1:stage_num
   %构造参考分布和扰动分布  
              normal_cumulative_area=normal_cdf_num(:,t,:);
-             P=normal_cumulative_area;%P=P/sum(P);
+             P=normal_cumulative_area;
              procancer_cumulative_area=procancer_cdf_num(:,t,:);
-             Q=procancer_cumulative_area; %Q=Q/sum(Q);  
+             Q=procancer_cumulative_area; 
            
   %检测临界状态  
          for s=1:patients_num(t)
@@ -90,19 +90,15 @@ for t=1:stage_num
            jsd(i,t,s)=0.5*(sum(P(i,1,s).*log(2.*P(i,1,s)./(P(i,1,s)+Q(i,1,s))))+sum(Q(i,1,s).*log(2.*Q(i,1,s)./(P(i,1,s)+Q(i,1,s))))); %JS散度   
            jsd1_t(i,t)=jsd1_t(i,t)+jsd(i,t,s);
            jsd2_t(t,s)=jsd2_t(t,s)+jsd(i,t,s)
-           normal_cumulative_area1(i,s)=normal_cdf_num(i,t,s);
-           P1(i)=mean(normal_cumulative_area1(i,:));
           end
          end
            jsd_t(t)=jsd_t(t)+sum(jsd1_t(:,t))/msize(1);
            [jsdgene_idx,indx]=sort(jsd1_t(:,t),'descend');
- %识别关键标志物基因
-           for k=1:100
+           for k=1:500
            jsd_genstage_id(k,t)=geneid_cdf_num(indx(k),t);
            jsd_top5gene_data(k,t)=jsd1_t(indx(k),t);
         end
 end
-%临界样本的关键标志物提取
  for k=1:1000
          for s=1:patients_num(t)
        jsd_gensamp_id(k,s)=geneid_cdf_num(indx(k),2,s);
