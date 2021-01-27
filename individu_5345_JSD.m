@@ -1,7 +1,7 @@
 clear;
 clc;
 close all;
-fpi=fopen('control_pro_cancer.txt');           %¶ÔÕÕÑù±¾
+fpi=fopen('control_pro_cancer.txt');           %å¯¹ç…§æ ·æœ¬
 hline1 = textscan(fpi, '%s', 1, 'delimiter', '\n');  
 field1=textscan(hline1{1}{1},'%s'); 
 format='%s';      
@@ -17,7 +17,7 @@ pprofile = [pprofile, plines{i}];
 end   
 fclose(fpi);
 
-fpi=fopen('case_pro_cancer.txt');                %²¡ÀıÑù±¾
+fpi=fopen('case_pro_cancer.txt');                %ç—…ä¾‹æ ·æœ¬
 hline2 = textscan(fpi, '%s', 1, 'delimiter', '\n');
 field2=textscan(hline2{1}{1},'%s');
 clear format;
@@ -34,7 +34,7 @@ for i = 2 :31
 end
 fclose(fpi);
 
-%Ñù±¾·Ö×é
+%æ ·æœ¬åˆ†ç»„
 psize=size(pprofile);
 tempcontrol=pprofile;
 reference_num=4;
@@ -50,26 +50,26 @@ tempcase(:,6,1:patients_num(6))=mprofile(:,23:26); % Stage IIIB
 tempcase(:,7,1:patients_num(7))=mprofile(:,27:30); % Stage IV
 msize=size(tempcase);
 
-%Îª²Î¿¼Ñù±¾ÄâºÏguass·Ö²¼
+%ä¸ºå‚è€ƒæ ·æœ¬æ‹Ÿåˆguassåˆ†å¸ƒ
 jsd_t=zeros(1,stage_num);
 jsd1_t=zeros(psize(1),stage_num);
 jsd2_t=zeros(stage_num,7);
 
 for t=1:stage_num
-        for s=1:patients_num(t)  %i±íÊ¾»ùÒò¸öÊı
-            for i=1:psize(1)  %i±íÊ¾»ùÒò¸öÊı
-             mu=mean(tempcontrol(i,1:reference_num));   %µÚi¸ö»ùÒòµÄ¾ùÖµ
-             sigma=std(tempcontrol(i,1:reference_num));  %µÚi¸ö»ùÒòµÄ±ê×¼²î
-             procancer_pdf(i,t,s)= normpdf(reshape(tempcase(i,t,s),1,1),mu,sigma); %case sample ¼ÆËãtumor(i,t,s)¸ÃÔªËØÔÚÕıÌ¬·Ö²¼N£¨mu,sigma£©ÏÂµÄ¸ÅÂÊÃÜ¶ÈÖµ¡£normpdfÇó³öÀ´±í¸ÅÂÊ
-             normal_pdf(i,:)=normpdf(tempcontrol(i,1:reference_num),mu,sigma); %control sample ¼ÆËã²Î¿¼Ñù±¾ÖĞÃ¿¸ö»ùÒòÔÚÕıÌ¬·Ö²¼N£¨mu,sigma£©ÏÂµÄ¸ÅÂÊÃÜ¶ÈÖµ¡£
-             procancer_cdf(i,t,s)=normcdf(reshape(tempcase(i,t,s),1,1),mu,sigma);  %ÇóÔªËØÔÚ¸Ã·Ö²¼ÏÂµÄÀÛ»ı¸ÅÂÊ£¬¼´»ı·ÖÃæ»ı¡£
-             if procancer_cdf(i,t,s)<(normcdf(mu-4*sigma,mu,sigma))  %4´ÓºÎÀ´£¿
+        for s=1:patients_num(t)  
+            for i=1:psize(1)  
+             mu=mean(tempcontrol(i,1:reference_num));   
+             sigma=std(tempcontrol(i,1:reference_num)); 
+             procancer_pdf(i,t,s)= normpdf(reshape(tempcase(i,t,s),1,1),mu,sigma); %case sample 
+             normal_pdf(i,:)=normpdf(tempcontrol(i,1:reference_num),mu,sigma); %control sample 
+             procancer_cdf(i,t,s)=normcdf(reshape(tempcase(i,t,s),1,1),mu,sigma);  
+             if procancer_cdf(i,t,s)<(normcdf(mu-4*sigma,mu,sigma)) 
                 procancer_cdf(i,t,s)=1-procancer_cdf(i,t,s);
              end
              normal_cdf(i,1:reference_num)=normcdf(tempcontrol(i,1:reference_num),mu,sigma);
             end
-            [tmp_com_idx,index]=sort(procancer_cdf(:,t,s),1,'descend');%tmp_com_idx±íÊ¾ÉıĞòºóµÄtumorÊı¾İ£¬indexÎªÉıĞòºóµÄÊı¾İÔÚtumorÖĞµÄË÷Òı¡£
-         for i=1:psize(1)  %i±íÊ¾»ùÒò¸öÊı
+            [tmp_com_idx,index]=sort(procancer_cdf(:,t,s),1,'descend');
+         for i=1:psize(1) 
              geneid_cdf_num(i,t,s)=pipi(index(i));
              procancer_cdf_num(i,t,s)=procancer_cdf(index(i),t,s);
              normal_cdf_num(i,t,s)=mean(normal_cdf(index(i),1:reference_num));
@@ -78,16 +78,16 @@ for t=1:stage_num
 end
  
 for t=1:stage_num
-  %¹¹Ôì²Î¿¼·Ö²¼ºÍÈÅ¶¯·Ö²¼  
-             normal_cumulative_area=normal_cdf_num(:,t,:);%ÀÛ»ı¸ÅÂÊ¼´Îª·Ö²¼¾Û¼¯ÇøÓò£¬Ãæ»ı
+  %æ„é€ å‚è€ƒåˆ†å¸ƒå’Œæ‰°åŠ¨åˆ†å¸ƒ  
+             normal_cumulative_area=normal_cdf_num(:,t,:);
              P=normal_cumulative_area;%P=P/sum(P);
              procancer_cumulative_area=procancer_cdf_num(:,t,:);
              Q=procancer_cumulative_area; %Q=Q/sum(Q);  
            
-  %¼ì²âÁÙ½ç×´Ì¬  
+  %æ£€æµ‹ä¸´ç•ŒçŠ¶æ€  
          for s=1:patients_num(t)
-          for i=1:psize(1) %i±íÊ¾»ùÒò¸öÊı
-           jsd(i,t,s)=0.5*(sum(P(i,1,s).*log(2.*P(i,1,s)./(P(i,1,s)+Q(i,1,s))))+sum(Q(i,1,s).*log(2.*Q(i,1,s)./(P(i,1,s)+Q(i,1,s))))); %JSÉ¢¶È   
+          for i=1:psize(1) 
+           jsd(i,t,s)=0.5*(sum(P(i,1,s).*log(2.*P(i,1,s)./(P(i,1,s)+Q(i,1,s))))+sum(Q(i,1,s).*log(2.*Q(i,1,s)./(P(i,1,s)+Q(i,1,s))))); %JSæ•£åº¦   
            jsd1_t(i,t)=jsd1_t(i,t)+jsd(i,t,s);
            jsd2_t(t,s)=jsd2_t(t,s)+jsd(i,t,s)
            normal_cumulative_area1(i,s)=normal_cdf_num(i,t,s);
@@ -95,14 +95,14 @@ for t=1:stage_num
           end
          end
            jsd_t(t)=jsd_t(t)+sum(jsd1_t(:,t))/msize(1);
-           [jsdgene_idx,indx]=sort(jsd1_t(:,t),'descend');%tmp_com_idx±íÊ¾ÉıĞòºóµÄtumorÊı¾İ£¬indexÎªÉıĞòºóµÄÊı¾İÔÚtumorÖĞµÄË÷Òı¡£
- %Ê¶±ğ¹Ø¼ü±êÖ¾Îï»ùÒò
+           [jsdgene_idx,indx]=sort(jsd1_t(:,t),'descend');
+ %è¯†åˆ«å…³é”®æ ‡å¿—ç‰©åŸºå› 
            for k=1:100
            jsd_genstage_id(k,t)=geneid_cdf_num(indx(k),t);
            jsd_top5gene_data(k,t)=jsd1_t(indx(k),t);
         end
 end
-%ÁÙ½çÑù±¾µÄ¹Ø¼ü±êÖ¾ÎïÌáÈ¡
+%ä¸´ç•Œæ ·æœ¬çš„å…³é”®æ ‡å¿—ç‰©æå–
  for k=1:1000
          for s=1:patients_num(t)
        jsd_gensamp_id(k,s)=geneid_cdf_num(indx(k),2,s);
